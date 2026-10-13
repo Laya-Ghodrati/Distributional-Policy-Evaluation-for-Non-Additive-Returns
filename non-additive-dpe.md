@@ -1,8 +1,10 @@
 # A Note on Distributional Policy Evaluation for Non-Additive Returns
 
-**Laya Ghodrati**
+**Laya Ghodrati**[^corr]
 
-Correspondence to: `laya71@gmail.com`
+[^corr]: Correspondence to: `laya71@gmail.com`
+
+> **Disclaimer.** The central observation is the author's; the proofs, code, and literature review were generated with AI assistance.
 
 ---
 
@@ -16,11 +18,15 @@ In Markov decision processes with non-additive performance criteria—such as pe
 
 Value-based reinforcement learning evaluates stationary policies by modeling cumulative returns. In standard Markov Decision Processes (MDPs), the state-action value function evaluates expected geometrically discounted sums:
 
-$$Q^\pi(s, a) = \mathbb{E} \left[ \sum_{t=0}^\infty \gamma^t R_t \;\middle\vert{}\; S_0 = s, A_0 = a \right]. \tag{1}$$
+```math
+Q^\pi(s, a) = \mathbb{E} \left[ \sum_{t=0}^\infty \gamma^t R_t \;\middle\vert{}\; S_0 = s, A_0 = a \right]. \tag{1}
+```
 
 Distributional Reinforcement Learning (DRL) (Bellemare et al., 2017) instead tracks the full return distribution $Z^\pi(s, a)$, where $\mathbb{E}[Z^\pi(s, a)] = Q^\pi(s, a)$. The standard distributional Bellman equation relies on an affine relation:
 
-$$T_{R, \gamma}(x) = R + \gamma x \implies Z(s, a) \stackrel{D}{:=} (T_{R, \gamma})_\sharp Z(S', A'). \tag{2}$$
+```math
+T_{R, \gamma}(x) = R + \gamma x \implies Z(s, a) \stackrel{D}{:=} (T_{R, \gamma})_\sharp Z(S', A'). \tag{2}
+```
 
 This linear relation does not capture objectives that accumulate non-additively:
 
@@ -32,13 +38,17 @@ This linear relation does not capture objectives that accumulate non-additively:
 
 In scalar RL, non-additive aggregators break the dynamic programming recursion on the base state space $\mathcal{S}$ because expectation does not commute with non-linear functions:
 
-$$\mathbb{E}[\max(R, \gamma G)] \ne \max(R, \, \gamma \mathbb{E}[G]). \tag{3}$$
+```math
+\mathbb{E}[\max(R, \gamma G)] \ne \max(R, \, \gamma \mathbb{E}[G]). \tag{3}
+```
 
 To address this, recent works on max-reward and non-cumulative MDPs (Veviurko et al., 2024; Nägele et al., 2024) rely on *state augmentation*. They expand the state space to $\mathcal{S} \times \mathbb{R}$ to track the running historical maximum $h_t = \max_{k < t} \gamma^k R_k$ as an auxiliary state variable. While necessary for history-dependent decision-making, state augmentation introduces continuous state dimensions even when evaluating a fixed policy.
 
 In the distributional setting, this non-commutativity barrier does not apply to policy evaluation. Because the distributional Bellman equation operates at the level of random variables:
 
-$$Z(s, a) \stackrel{D}{:=} W\big(R(s, a, S'), \, Z(S', A')\big), \tag{4}$$
+```math
+Z(s, a) \stackrel{D}{:=} W\big(R(s, a, S'), \, Z(S', A')\big), \tag{4}
+```
 
 the law of the return under a fixed stationary policy $\pi$ can be evaluated directly on the base state space $\mathcal{S}$ without augmenting the state with historical statistics.
 
@@ -65,7 +75,9 @@ Following the classical conditions for generalized dynamic programming (Denardo,
 > 1. **Comonotonicity:** For all $r \in \mathbb{R}$, $z \mapsto W(r, z)$ is non-decreasing: $z_1 \le z_2 \implies W(r, z_1) \le W(r, z_2)$.
 > 2. **Uniform Lipschitz Contraction:** There exists $\kappa \in [0, 1)$ such that for all $r, z_1, z_2 \in \mathbb{R}$:
 >
-> $$\vert{}W(r, z_1) - W(r, z_2)\vert{} \le \kappa \vert{}z_1 - z_2\vert{}. \tag{5}$$
+> ```math
+> \vert{}W(r, z_1) - W(r, z_2)\vert{} \le \kappa \vert{}z_1 - z_2\vert{}. \tag{5}
+> ```
 >
 > 3. **Bounded Baseline:** $W(0, 0) = 0$ and $\sup_{r \in [-R_{\max}, R_{\max}]} \vert{}W(r, 0)\vert{} \le R_{\max}$.
 
@@ -75,15 +87,21 @@ Following the classical conditions for generalized dynamic programming (Denardo,
 
 Under bounded rewards and $\kappa < 1$, any invariant distribution $Z$ satisfying $Z \stackrel{D}{=} W(R, Z)$ has support contained in the compact interval:
 
-$$\mathcal{D} = \left[ -\frac{R_{\max}}{1 - \kappa}, \; \frac{R_{\max}}{1 - \kappa} \right]. \tag{6}$$
+```math
+\mathcal{D} = \left[ -\frac{R_{\max}}{1 - \kappa}, \; \frac{R_{\max}}{1 - \kappa} \right]. \tag{6}
+```
 
 Let $\mathcal{P}(\mathcal{D})$ denote probability measures supported on $\mathcal{D}$. For $p \in [1, \infty)$, the $p$-Wasserstein metric is:
 
-$$d_p(\mu, \nu) = \left( \int_0^1 \big\vert{} F_\mu^{-1}(u) - F_\nu^{-1}(u) \big\vert{}^p \, du \right)^{1/p}, \tag{7}$$
+```math
+d_p(\mu, \nu) = \left( \int_0^1 \big\vert{} F_\mu^{-1}(u) - F_\nu^{-1}(u) \big\vert{}^p \, du \right)^{1/p}, \tag{7}
+```
 
 and for $p = \infty$:
 
-$$d_\infty(\mu, \nu) = \sup_{u \in (0, 1)} \big\vert{} F_\mu^{-1}(u) - F_\nu^{-1}(u) \big\vert{}. \tag{8}$$
+```math
+d_\infty(\mu, \nu) = \sup_{u \in (0, 1)} \big\vert{} F_\mu^{-1}(u) - F_\nu^{-1}(u) \big\vert{}. \tag{8}
+```
 
 Because $\mathcal{D}$ is compact, $d_\infty(\mu, \nu) \le \frac{2 R_{\max}}{1 - \kappa} < \infty$. The space $(\mathcal{P}(\mathcal{D}), d_p)$ is a complete metric space for all $p \in [1, \infty]$ (Villani, 2009, Theorem 6.18). We endow the collection space $\mathcal{M} = \mathcal{P}(\mathcal{D})^{\vert \mathcal{S} \vert \times \vert \mathcal{A} \vert}$ with the maximal metric $\bar{d}_p(Z_1, Z_2) = \max_{s, a} d_p(Z_1(s, a), Z_2(s, a))$.
 
@@ -91,19 +109,25 @@ Because $\mathcal{D}$ is compact, $d_\infty(\mu, \nu) \le \frac{2 R_{\max}}{1 - 
 
 > **Definition 2.** The policy evaluation operator $\mathcal{T}_W^\pi: \mathcal{M} \to \mathcal{M}$ is defined by:
 >
-> $$(\mathcal{T}_W^\pi Z)(s, a) \stackrel{D}{:=} W\big(R(s, a, S'), \, Z(S', A')\big), \tag{9}$$
+> ```math
+> (\mathcal{T}_W^\pi Z)(s, a) \stackrel{D}{:=} W\big(R(s, a, S'), \, Z(S', A')\big), \tag{9}
+> ```
 >
 > where $S' \sim P(\cdot \mid s, a)$, $A' \sim \pi(\cdot \mid S')$, and $Z(S', A')$ is conditionally independent of $R(s, a, S')$ given $(S', A')$.
 
 > **Theorem 1 (Wasserstein Contraction).** Let $W$ be a Contractive Monotone Aggregator with modulus $\kappa \in [0, 1)$. Then for any $p \in [1, \infty]$, $\mathcal{T}_W^\pi$ is a strict $\kappa$-contraction on $(\mathcal{M}, \bar{d}_p)$:
 >
-> $$\bar{d}_p(\mathcal{T}_W^\pi Z_1, \, \mathcal{T}_W^\pi Z_2) \le \kappa \, \bar{d}_p(Z_1, Z_2), \tag{10}$$
+> ```math
+> \bar{d}_p(\mathcal{T}_W^\pi Z_1, \, \mathcal{T}_W^\pi Z_2) \le \kappa \, \bar{d}_p(Z_1, Z_2), \tag{10}
+> ```
 >
-> and possesses a unique fixed point $Z^{*, \pi} \in \mathcal{M}$.
+> and possesses a unique fixed point $Z^{\ast, \pi} \in \mathcal{M}$.
 
 *Proof.* Fix $(s, a)$. Let $(S', A') \sim P^\pi(\cdot \mid s, a)$, $R = R(s, a, S')$, and let $\rho_{S', A'}$ denote the optimal Wasserstein coupling achieving $d_p(Z_1(S', A'), Z_2(S', A'))$. Construct a coupling for $\mathcal{T}_W^\pi Z_1(s, a)$ and $\mathcal{T}_W^\pi Z_2(s, a)$ by passing $(U, V) \sim \rho_{S', A'}$ through $W$ under realization $R$: $X = W(R, U)$, $Y = W(R, V)$. By definition of $d_p$:
 
-$$\begin{aligned} d_p^p\Big( (\mathcal{T}_W^\pi Z_1)(s, a), \, (\mathcal{T}_W^\pi Z_2)(s, a) \Big) &\le \mathbb{E}_{R, S', A'} \Big[ \mathbb{E}_{(U, V) \sim \rho_{S', A'}} \big[ \vert{}X - Y\vert{}^p \big] \Big] \\ &\le \kappa^p \, \mathbb{E}_{S', A'} \Big[ d_p^p\big( Z_1(S', A'), Z_2(S', A') \big) \Big] \le \kappa^p \, \bar{d}_p^p(Z_1, Z_2). \end{aligned} \tag{11}$$
+```math
+\begin{aligned} d_p^p\Big( (\mathcal{T}_W^\pi Z_1)(s, a), \, (\mathcal{T}_W^\pi Z_2)(s, a) \Big) &\le \mathbb{E}_{R, S', A'} \Big[ \mathbb{E}_{(U, V) \sim \rho_{S', A'}} \big[ \vert{}X - Y\vert{}^p \big] \Big] \\ &\le \kappa^p \, \mathbb{E}_{S', A'} \Big[ d_p^p\big( Z_1(S', A'), Z_2(S', A') \big) \Big] \le \kappa^p \, \bar{d}_p^p(Z_1, Z_2). \end{aligned} \tag{11}
+```
 
 Taking the $p$-th root and maximum over $(s, a)$ yields the bound. For $p = \infty$, the essential supremum yields $\vert{}X - Y\vert{} \le \kappa \vert{}U - V\vert{} \le \kappa \bar{d}_\infty(Z_1, Z_2)$ almost surely. $\blacksquare$
 
@@ -117,29 +141,39 @@ Taking the $p$-th root and maximum over $(s, a)$ yields the bound. For $p = \inf
 
 For any random variable $X$ with quantile function $F_X^{-1}$ and any non-decreasing, continuous function $T$, the quantile function satisfies (Embrechts & Hofert, 2013):
 
-$$F_{T(X)}^{-1}(\tau) = T\big( F_X^{-1}(\tau) \big) \quad \text{for all } \tau \in (0, 1). \tag{12}$$
+```math
+F_{T(X)}^{-1}(\tau) = T\big( F_X^{-1}(\tau) \big) \quad \text{for all } \tau \in (0, 1). \tag{12}
+```
 
 For a single deterministic transition branch $(s, a) \to (r, s', a')$, quantiles propagate point-wise:
 
-$$q_\tau \leftarrow W\big(r, \, q_\tau(s', a')\big). \tag{13}$$
+```math
+q_\tau \leftarrow W\big(r, \, q_\tau(s', a')\big). \tag{13}
+```
 
 However, when transitions or rewards are stochastic, the target distribution is a mixture $\mu = \sum_k w_k \mu_k$. Quantile functions do not commute with convex combinations: $F_\mu^{-1}(\tau) \ne \sum_k w_k F_{\mu_k}^{-1}(\tau)$. Averaging quantiles across successors computes the 1D Wasserstein barycenter, which collapses distribution variance (Section 3.3).
 
 To project the mixture back into an $M$-quantile representation, we use the 1-Wasserstein quantile projection $\Pi_M^{W_1}$ (Bellemare et al., 2023, Chapter 5), which evaluates the generalized inverse mixture CDF at midpoints $\tau_m = \frac{2m - 1}{2M}$:
 
-$$\theta_m = F_\nu^{-1}(\tau_m), \quad m \in \{1, \dots, M\}. \tag{14}$$
+```math
+\theta_m = F_\nu^{-1}(\tau_m), \quad m \in \lbrace 1, \dots, M\rbrace. \tag{14}
+```
 
 ### 3.2 Contraction of the Projected Operator
 
 > **Theorem 2.** The projection $\Pi_M^{W_1}$ is a non-expansion in $d_\infty$: $d_\infty(\Pi_M^{W_1} \mu, \Pi_M^{W_1} \nu) \le d_\infty(\mu, \nu)$ (Dabney et al., 2018, Lemma 2 in proof of Proposition 2). Consequently:
 > 1. $\Pi_M^{W_1} \mathcal{T}_W^\pi$ is a strict $\kappa$-contraction in $\bar{d}_\infty$:
 >
-> $$\bar{d}_\infty(\Pi_M^{W_1} \mathcal{T}_W^\pi Z_1, \, \Pi_M^{W_1} \mathcal{T}_W^\pi Z_2) \le \kappa \, \bar{d}_\infty(Z_1, Z_2). \tag{15}$$
+> ```math
+> \bar{d}_\infty(\Pi_M^{W_1} \mathcal{T}_W^\pi Z_1, \, \Pi_M^{W_1} \mathcal{T}_W^\pi Z_2) \le \kappa \, \bar{d}_\infty(Z_1, Z_2). \tag{15}
+> ```
 >
-> 2. There exists a unique projected fixed point $Z_\theta^{*, \pi}$.
-> 3. The error relative to the true distribution $Z^{*, \pi}$ satisfies:
+> 2. There exists a unique projected fixed point $Z_\theta^{\ast, \pi}$.
+> 3. The error relative to the true distribution $Z^{\ast, \pi}$ satisfies:
 >
-> $$\bar{d}_\infty(Z_\theta^{*, \pi}, Z^{*, \pi}) \le \frac{1}{1 - \kappa} \, \bar{d}_\infty(\Pi_M^{W_1} Z^{*, \pi}, \, Z^{*, \pi}). \tag{16}$$
+> ```math
+> \bar{d}_\infty(Z_\theta^{\ast, \pi}, Z^{\ast, \pi}) \le \frac{1}{1 - \kappa} \, \bar{d}_\infty(\Pi_M^{W_1} Z^{\ast, \pi}, \, Z^{\ast, \pi}). \tag{16}
+> ```
 
 The proof follows directly from the non-expansion of $\Pi_M^{W_1}$, Theorem 1 at $p = \infty$, and Banach's Fixed-Point Theorem.
 
@@ -149,19 +183,25 @@ The following proposition explains why explicit mixture projection is necessary:
 
 > **Proposition 1 (Barycentric Variance Collapse).** Let $T_{\text{bary}}$ denote the update that averages quantiles across successors:
 >
-> $$\theta_m^{(n+1)}(s) = \sum_{s'} P(s' \mid s) \sum_k p_k \, W\big(r_k, \, \theta_m^{(n)}(s')\big), \tag{17}$$
+> ```math
+> \theta_m^{(n+1)}(s) = \sum_{s'} P(s' \mid s) \sum_k p_k \, W\big(r_k, \, \theta_m^{(n)}(s')\big), \tag{17}
+> ```
 >
-> where $k \in \{1, \dots, K\}$ indexes reward outcomes and $n$ indexes iteration. Then for every atom index $m \in \{1, \dots, M\}$, the vector $\mathbf{v}_m^{(n)} = [\theta_m^{(n)}(s_1), \dots, \theta_m^{(n)}(s_{\vert \mathcal{S} \vert})]^T$ evolves under the same scalar contraction $F: \mathbb{R}^{\vert \mathcal{S} \vert} \to \mathbb{R}^{\vert \mathcal{S} \vert}$:
+> where $k \in \lbrace 1, \dots, K\rbrace$ indexes reward outcomes and $n$ indexes iteration. Then for every atom index $m \in \lbrace 1, \dots, M\rbrace$, the vector $\mathbf{v}_m^{(n)} = [\theta_m^{(n)}(s_1), \dots, \theta_m^{(n)}(s_{\vert \mathcal{S} \vert})]^T$ evolves under the same scalar contraction $F: \mathbb{R}^{\vert \mathcal{S} \vert} \to \mathbb{R}^{\vert \mathcal{S} \vert}$:
 >
-> $$[F(\mathbf{v})](s) = \sum_{s'} P(s' \mid s) \sum_k p_k \, W\big(r_k, \, \mathbf{v}(s')\big), \tag{18}$$
+> ```math
+> [F(\mathbf{v})](s) = \sum_{s'} P(s' \mid s) \sum_k p_k \, W\big(r_k, \, \mathbf{v}(s')\big), \tag{18}
+> ```
 >
-> which is a $\kappa$-contraction in $\Vert{}\cdot\Vert{}_\infty$. For any initialization, all $M$ atom vectors converge to the identical scalar vector $\mathbf{v}^*$:
+> which is a $\kappa$-contraction in $\Vert{}\cdot\Vert{}_\infty$. For any initialization, all $M$ atom vectors converge to the identical scalar vector $\mathbf{v}^{\ast}$:
 >
-> $$\lim_{n \to \infty} \theta_m^{(n)}(s) = v^*(s) \quad \text{for all } m \in \{1, \dots, M\}, \tag{19}$$
+> ```math
+> \lim_{n \to \infty} \theta_m^{(n)}(s) = v^{\ast}(s) \quad \text{for all } m \in \lbrace 1, \dots, M\rbrace, \tag{19}
+> ```
 >
 > collapsing the representation to a single point mass.
 
-*Proof.* Coordinate $m$ does not interact with any other coordinate $j \ne m$. For $\mathbf{u}, \mathbf{v} \in \mathbb{R}^{\vert \mathcal{S} \vert}$, the Lipschitz property yields $\vert{}[F(\mathbf{u})](s) - [F(\mathbf{v})](s)\vert{} \le \kappa \Vert{}\mathbf{u} - \mathbf{v}\Vert{}_\infty$. By Banach's theorem, $F$ has a unique fixed point $\mathbf{v}^*$. Because the recurrence $\mathbf{v}_m^{(n+1)} = F(\mathbf{v}_m^{(n)})$ is identical for all $m$, $\mathbf{v}_m^{(n)} \to \mathbf{v}^*$ as $n \to \infty$. $\blacksquare$
+*Proof.* Coordinate $m$ does not interact with any other coordinate $j \ne m$. For $\mathbf{u}, \mathbf{v} \in \mathbb{R}^{\vert \mathcal{S} \vert}$, the Lipschitz property yields $\vert{}[F(\mathbf{u})](s) - [F(\mathbf{v})](s)\vert{} \le \kappa \Vert{}\mathbf{u} - \mathbf{v}\Vert{}_\infty$. By Banach's theorem, $F$ has a unique fixed point $\mathbf{v}^{\ast}$. Because the recurrence $\mathbf{v}_m^{(n+1)} = F(\mathbf{v}_m^{(n)})$ is identical for all $m$, $\mathbf{v}_m^{(n)} \to \mathbf{v}^{\ast}$ as $n \to \infty$. $\blacksquare$
 
 ### 3.4 Algorithm: Non-Additive Quantile Value Iteration (NA-QVI)
 
@@ -173,9 +213,11 @@ Let $B = \vert \mathcal{S}' \vert \vert \mathcal{A}' \vert K$ be the number of d
 
 ### 4.1 Benchmark Setup
 
-We evaluate a 3-state recurrent Markov Reward Process ($\mathcal{S} = \{s_0, s_1, s_2\}$, $\vert \mathcal{A} \vert = 1$):
+We evaluate a 3-state recurrent Markov Reward Process ($\mathcal{S} = \lbrace s_0, s_1, s_2\rbrace$, $\vert \mathcal{A} \vert = 1$):
 
-$$P = \begin{pmatrix} 0.5 & 0.3 & 0.2 \\ 0.4 & 0.4 & 0.2 \\ 0.2 & 0.3 & 0.5 \end{pmatrix}. \tag{20}$$
+```math
+P = \begin{pmatrix} 0.5 & 0.3 & 0.2 \\ 0.4 & 0.4 & 0.2 \\ 0.2 & 0.3 & 0.5 \end{pmatrix}. \tag{20}
+```
 
 Transitions emit bimodal rewards (background load with probability $1 - p_{\text{spike}}$, surge with probability $p_{\text{spike}}$):
 $(s_0, s_0)$: $1.0$ ($0.8$), $6.0$ ($0.2$);
@@ -193,11 +235,13 @@ We evaluate the peak surge aggregator $W_{\max}(r, z) = \max(r, 0.85 z)$ on stat
 
 For the discounted peak process $G = \max_{t=0}^H \gamma^t R_t$, notice that $\max_{t=0}^H \gamma^t R_t \le x \iff R_t \le \gamma^{-t} x$ for all $t$. Defining $[P_t(x)]_{s, s'} = P(s' \mid s) \sum_{k: r_k \le \gamma^{-t} x} p_k$, the exact CDF at horizon $H = 60$ ($R_{\max} \gamma^{60} \le 12 \cdot 0.85^{60} \approx 6.94 \times 10^{-4}$) is computed via backward products:
 
-$$F_{Z(s_0)}(x) = \mathbf{e}_{s_0}^T \left( \prod_{t=0}^H P_t(x) \right) \mathbf{1}. \tag{21}$$
+```math
+F_{Z(s_0)}(x) = \mathbf{e}_{s_0}^T \left( \prod_{t=0}^H P_t(x) \right) \mathbf{1}. \tag{21}
+```
 
 ### 4.3 Results
 
-To examine behavior across different support regions, we test a sweep of thresholds $\Lambda$ categorized by position: *Near-atom* ($\Lambda = 10.0$, immediately adjacent to the 9% atom at 10.0), *Inter-atom* ($\Lambda = 7.0$, situated between discrete probability masses), and *Off-atom* ($\Lambda \in \{3.5, 5.0, 8.5, 9.5, 10.5\}$, lying in smooth support regions or beyond the support). The results are summarized in Tables 1–3 and illustrated in Figure 1.
+To examine behavior across different support regions, we test a sweep of thresholds $\Lambda$ categorized by position: *Near-atom* ($\Lambda = 10.0$, immediately adjacent to the 9% atom at 10.0), *Inter-atom* ($\Lambda = 7.0$, situated between discrete probability masses), and *Off-atom* ($\Lambda \in \lbrace 3.5, 5.0, 8.5, 9.5, 10.5\rbrace$, lying in smooth support regions or beyond the support). The results are summarized in Tables 1–3 and illustrated in Figure 1.
 
 **Table 1.** Distributional metrics and quantiles for peak surge $Z(s_0)$. Additive QDP computes the cumulative sum $\sum_t \gamma^t R_t$; reported to illustrate proxy mismatch.
 
@@ -240,7 +284,7 @@ To examine behavior across different support regions, we test a sweep of thresho
 1. **NA-QVI Accuracy and Atom Quantization:** NA-QVI tracks the exact analytical CDF across quantiles ($W_1 = 0.0143$ at $M = 200$). In Table 3, $W_1$ error does not decrease strictly monotonically from $M=50$ to $M=100$. Unlike continuous distributions where quantile approximation error scales smoothly as $\mathcal{O}(1/M)$, discrete distributions exhibit step discontinuities; uniform midpoint grids $\tau_m = \frac{2m-1}{2M}$ can exhibit slight alignment oscillations across finite $M$ depending on whether specific midpoints fall immediately before or after a jump.
 2. **Additive Model Mismatch:** An additive discounted sum accumulates background transitions over time ($q_{0.50} = 16.89$ vs. true peak $5.22$), predicting a $99.50\%$ breach probability at $\Lambda = 7.0$ where the true system breaches only $28.88\%$ of the time.
 3. **Categorical Grid Smearing:** At $\Lambda = 10.0$, the true breach probability is $1.50\%$ (governed by entering $s_1$ at $t=0$ and realizing $R(s_1, s_2)=12.0$ at $t=1$: $0.3 \times 0.2 \times 0.25 = 0.015$). However, C51 ($N=51$) reports $4.35\%$ and C51 ($N=200$) reports $7.20\%$. This inflation is caused by the 9% probability atom at exactly $r = 10.0$ ($P(s_0 \to s_1) \cdot P(R=10) = 0.3 \times 0.3 = 0.09$). For $N=51$ on $[0, 15]$ (grid spacing $\Delta z = 0.3$), $10.0$ is not a grid node ($10.0 / 0.3 = 33.33$). Categorical projection splits this 9% mass between node $33$ ($9.9$) and node $34$ ($10.2$), pushing $(10.0 - 9.9)/0.3 = 1/3$ of the mass ($3.0\%$) onto node $34 > 10.0$. Adding this smeared mass to the true $1.50\%$ yields $4.35\%$.
-4. **Barycentric Collapse:** The naive barycentric update converges to $\mathbf{v}^* = [5.2209, 5.0038, 5.8339]^T$ across all atoms ($W_1 = 2.259$), confirming Proposition 1.
+4. **Barycentric Collapse:** The naive barycentric update converges to $\mathbf{v}^{\ast} = [5.2209, 5.0038, 5.8339]^T$ across all atoms ($W_1 = 2.259$), confirming Proposition 1.
 
 ---
 
