@@ -4,7 +4,8 @@
 
 [^corr]: Correspondence to: `laya71@gmail.com`
 
-> **Disclaimer.** The central observation is the author's; the proofs, code, and literature review were generated with AI assistance.
+> **Disclaimer.** The central observation is the author's; the manuscript text, proofs, code, and literature review were generated with AI models and have not been fully independently verified.
+
 
 ---
 
